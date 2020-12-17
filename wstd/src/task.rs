@@ -1,29 +1,33 @@
-use core::pin::Pin;
-use core::future::Future;
-use core::task::{Waker, RawWaker, RawWakerVTable, Context, Poll};
 use core::cell::{RefCell, Cell};
+use core::pin::Pin;
 use alloc::boxed::Box;
+use core::future::Future;
 use alloc::rc::Rc;
+use core::task::{Waker, RawWaker, RawWakerVTable, Poll, Context};
 use core::mem::ManuallyDrop;
-use crate::queue::{Queue};
+use crate::runtime::Runtime;
+
+pub struct Task {
+    inner: RefCell<Option<Inner>>,
+
+    is_queued: Cell<bool>,
+
+    runtime:RefCell<Runtime>
+}
 
 struct Inner {
     future: Pin<Box<dyn Future<Output = ()> + 'static>>,
     waker: Waker,
 }
 
-pub struct Task {
-    inner: RefCell<Option<Inner>>,
-
-    is_queued: Cell<bool>,
-}
 
 impl Task {
-    pub fn spawn(future: Pin<Box<dyn Future<Output = ()> + 'static>>) {
+    pub fn spawn(future: Pin<Box<dyn Future<Output = ()> + 'static>>, runtime: Runtime) {
         //构建task
         let this = Rc::new(Self {
             inner: RefCell::new(None),
             is_queued: Cell::new(false),
+            runtime: RefCell::new(runtime),
         });
 
         //构建wake
@@ -37,6 +41,7 @@ impl Task {
         Task::wake_by_ref(&this);
     }
 
+
     //入队
     fn wake_by_ref(this: &Rc<Self>) {
         //如果为true，就返回
@@ -44,11 +49,8 @@ impl Task {
             return;
         }
 
-        //将这个task加入到队列中
-        // crate::queue::QUEUE.with(|queue| {
-        //     queue.push_task(Rc::clone(this));
-        // });
-        Queue::push_task(&crate::queue::QUEUE,Rc::clone(this));
+       let runtime = this.runtime.borrow_mut();
+        runtime.push_task(Rc::clone(this))
     }
 
     //waker是RawWaker的包装，调用的wake其实就是RawWaker的虚拟表中的定义wake
@@ -109,3 +111,4 @@ impl Task {
         }
     }
 }
+

@@ -4,7 +4,6 @@ const { print } = require("./tools/debug");
 const { _read_file_callback } = require("./tools/fs");
 
 let actor_bin_instance = null;
-
 (async () => {
   let actor_bin_code = fs.readFileSync('target/wasm32-unknown-unknown/release/actor_bin.wasm');
 

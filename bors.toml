@@ -1,0 +1,4 @@
+status = [
+  'test-linux'
+]
+delete_merged_branches = true
