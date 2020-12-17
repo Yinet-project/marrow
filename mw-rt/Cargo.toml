@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 mw-macros = { path = "../mw-macros" }
+mw-std = { path = "../mw-std" }

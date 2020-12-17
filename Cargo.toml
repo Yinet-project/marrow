@@ -2,5 +2,6 @@
 members = [
     'mw-macros',
     'mw-rt',
+    'mw-std',
     'demo'
 ]
