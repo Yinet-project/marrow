@@ -5,8 +5,6 @@ use core::option::Option::Some;
 use core::pin::Pin;
 use core::task::{Context, Poll, Waker};
 use alloc::rc::Rc;
-use alloc::format;
-use crate::debug;
 
 unsafe extern "C" fn hook<F>(user_data: *mut c_void, result: u8)
 where
@@ -64,7 +62,6 @@ impl Future for ReadFile {
     fn poll(self: Pin<&mut Self>, cx: &mut Context) -> Poll<Self::Output> {
         // let mut task = self.task.unwrap();
         let mut inner = self.inner.borrow_mut();
-        debug::println("poll");
 
         if let Some(x) = inner.result.take() {
             return Poll::Ready(x);
@@ -81,17 +78,13 @@ pub fn read_file(s: &str) -> ReadFile {
     //是回调触发后才开始poll
     //由于第一次poll执行失败，waker没传出来，导致回调了也无法唤醒第二次poll
     let fu = ReadFile::default();
-    let inner = fu.inner.as_ptr();
+    let mut inner = fu.inner.borrow_mut();
     read_file_callback(s, move |result: u8| {
-        debug::println(&format!("{:?}", inner));
-        unsafe {
-            let inner = &mut *inner;
-            inner.result = Some(result);
-            let task_op = &inner.task.as_ref();
-            if task_op.is_some() {
-                task_op.unwrap().wake_by_ref()
-            };
-        }
+        inner.result = Some(result);
+        let task_op = &inner.task.as_ref();
+        if task_op.is_some() {
+            task_op.unwrap().wake_by_ref()
+        };
     });
     fu
 }

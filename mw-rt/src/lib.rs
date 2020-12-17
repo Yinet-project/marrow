@@ -10,4 +10,5 @@ pub use mw_macros::main;
 pub mod runtime;
 pub mod task;
 
-mod utils;
+#[cfg(target_arch = "wasm32")]
+mod panic;
