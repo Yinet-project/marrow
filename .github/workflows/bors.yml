@@ -29,7 +29,6 @@ jobs:
       # - uses: saltbo/uptoc@master
       #   with:
       #     driver: oss
-      #     region: cn-zhangjiakou
+      #     region: cn-shenzhen
       #     bucket: curdata-rustdoc
-      #     exclude: .cache,test
       #     dist: target/doc/marrow
