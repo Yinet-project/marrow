@@ -1,6 +1,5 @@
 status = [
-  'test-linux'
+  'bors'
 ]
 use_squash_merge = true
-use_codeowners = true
 delete_merged_branches = true
