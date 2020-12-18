@@ -1,7 +1,18 @@
 # Marrow
-Marrow 是一个安全的运行时环境，Marrow 提供了一套层次化的API体系，以及对使用API访问外部环境时的控制。Marrow允许将 Webassembly 环境应用至包括嵌入式设备在内的多种设备环境中。
+
+[简体中文](README.zh.md)
+
+`Marrow` is a safety runtime for unversal device. Now `Marrow` use `Webassembly` as runtime.
+
+## Design
+
+
+
+## Usage
 
 ## Roadmap
+
+### Runtime for Javascript
 
 - [ ] Marrow
   - [X] NativeModule.

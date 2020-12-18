@@ -22,3 +22,14 @@ jobs:
           use-cross: true
           command: build
           args: --target wasm32-unknown-unknown
+      - uses: actions-rs/cargo@v1
+        with:
+          use-cross: true
+          command: doc
+      - uses: saltbo/uptoc@master
+        with:
+          driver: oss
+          region: cn-zhangjiakou
+          bucket: curdata-rustdoc
+          exclude: .cache,test
+          dist: target/doc/marrow
