@@ -1,15 +1,17 @@
 use core::cell::{RefCell, Cell};
 use alloc::collections::VecDeque;
 use alloc::rc::Rc;
+use alloc::boxed::Box;
+use core::future::Future;
 
-struct QueueState {
+struct Queue {
     //task队列
     tasks: RefCell<VecDeque<Rc<crate::task::Task>>>,
     //可变属性
     is_spinning: Cell<bool>,
 }
 
-impl QueueState {
+impl Queue {
     fn run_all(&self) {
         //false就panic
         debug_assert!(self.is_spinning.get());
@@ -27,45 +29,33 @@ impl QueueState {
     }
 }
 
-pub struct Queue {
-    state: Rc<QueueState>,
+pub struct Runtime {
+    queue: Queue,
 }
 
-unsafe impl Sync for Queue {}
 
-impl Queue {
-    pub(crate) fn push_task(&self, task: Rc<crate::task::Task>) {
-        self.state.tasks.borrow_mut().push_back(task);
-
-        if !self.state.is_spinning.replace(true) {
-            self.state.run_all();
-        }
-    }
-}
-
-impl Queue {
-    fn new() -> Self {
-        let state = Rc::new(QueueState {
+impl Runtime {
+    pub fn new() -> Self {
+        let queue = Queue {
             is_spinning: Cell::new(false),
             tasks: RefCell::new(VecDeque::new()),
-        });
+        };
 
         Self {
-            state,
+            queue,
         }
+    }
+
+    pub fn spawn<F>(self,future: F) where F: Future<Output = ()> + 'static,
+    {
+        crate::task::Task::spawn(Box::pin(future),self);
+    }
+
+    pub(crate) fn push_task(&self, task: Rc<crate::task::Task>) {
+        self.queue.tasks.borrow_mut().push_back(task);
+
+        if !self.queue.is_spinning.replace(true) { self.queue.run_all() }
     }
 }
 
 
-
-
-lazy_static!{
-    // pub(crate) static QUEUE: Queue = Queue::new();
-    pub static ref QUEUE: Queue = Queue::new();
-}
-
-//全局队列
-//no_std下无法使用
-// thread_local! {
-//     pub(crate) static QUEUE: Queue = Queue::new();
-// }
