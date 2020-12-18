@@ -3,6 +3,7 @@ const fs = require("fs/promises");
 const { print } = require("./debug");
 const { _read_file_callback } = require("./fs");
 const { _request_callback } = require("./request");
+const { _sqlite_callback } = require("./sqlite");
 
 let actor_bin_instance = null;
 
@@ -11,6 +12,7 @@ let import_object = {
     print,
     _read_file_callback,
     _request_callback,
+    _sqlite_callback,
   }
 };
 
