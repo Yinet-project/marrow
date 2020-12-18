@@ -26,10 +26,10 @@ jobs:
         with:
           use-cross: true
           command: doc
-      - uses: saltbo/uptoc@master
-        with:
-          driver: oss
-          region: cn-zhangjiakou
-          bucket: curdata-rustdoc
-          exclude: .cache,test
-          dist: target/doc/marrow
+      # - uses: saltbo/uptoc@master
+      #   with:
+      #     driver: oss
+      #     region: cn-zhangjiakou
+      #     bucket: curdata-rustdoc
+      #     exclude: .cache,test
+      #     dist: target/doc/marrow
